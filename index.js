@@ -26,6 +26,7 @@ async function createTable() {
     console.error("Error creating tables:", err);
   }
 }
+
 /**
  * Inserts a new movie into the Movies table.
  *
@@ -35,14 +36,27 @@ async function createTable() {
  * @param {string} director Director of the movie
  */
 async function insertMovie(title, year, genre, director) {
-  // TODO: Add code to insert a new movie into the Movies table
+  try {
+    await pool.query(
+      "INSERT INTO Movies (title, release_year, genre, director_name) VALUES ($1, $2, $3, $4)",
+      [title, year, genre, director]
+    );
+    console.log(`Movie "${title}" added successfully.`);
+  } catch (err) {
+    console.error("Error inserting movie:", err);
+  }
 }
 
 /**
  * Prints all movies in the database to the console
  */
 async function displayMovies() {
-  // TODO: Add code to retrieve and print all movies from the Movies table
+  try {
+    const res = await pool.query("SELECT * FROM Movies");
+    console.table(res.rows);
+  } catch (err) {
+    console.error("Error fetching movies:", err);
+  }
 }
 
 /**
@@ -52,7 +66,15 @@ async function displayMovies() {
  * @param {string} newEmail New email address of the customer
  */
 async function updateCustomerEmail(customerId, newEmail) {
-  // TODO: Add code to update a customer's email address
+  try {
+    await pool.query(
+      "UPDATE Customers SET email_address = $1 WHERE customer_id = $2",
+      [newEmail, customerId]
+    );
+    console.log(`Customer ${customerId}'s email updated to ${newEmail}.`);
+  } catch (err) {
+    console.error("Error updating email:", err);
+  }
 }
 
 /**
@@ -61,18 +83,42 @@ async function updateCustomerEmail(customerId, newEmail) {
  * @param {number} customerId ID of the customer to remove
  */
 async function removeCustomer(customerId) {
-  // TODO: Add code to remove a customer and their rental history
+  try {
+    // Delete rentals associated with customer
+    await pool.query("DELETE FROM Rentals WHERE customer_id = $1", [
+      customerId,
+    ]);
+    // Delete customer
+    await pool.query("DELETE FROM Customers WHERE customer_id = $1", [
+      customerId,
+    ]);
+    console.log(`Customer ${customerId} and their rental history removed.`);
+  } catch (err) {
+    console.error("Error removing customer:", err);
+  }
 }
 
 /**
  * Prints a help message to the console
+ *
+ * I tidied it up for ease of use :)
  */
 function printHelp() {
+  console.log("Steve`s Movie Rentals");
+  console.log("------------------------");
   console.log("Usage:");
-  console.log("  insert <title> <year> <genre> <director> - Insert a movie");
-  console.log("  show - Show all movies");
-  console.log("  update <customer_id> <new_email> - Update a customer's email");
-  console.log("  remove <customer_id> - Remove a customer from the database");
+  console.log('   - Insert "<title>" <year> "<genre>" "<director>"');
+  console.log("  -- This Inserts a new movie into the database.");
+  console.log("");
+  console.log("   - show");
+  console.log("  -- This shows all movies in the database.");
+  console.log("");
+  console.log("   - update <customer_id> <new_email>");
+  console.log("  -- Update the email address of a customer.");
+  console.log("");
+  console.log("   - remove <customer_id>");
+  console.log("  -- Remove a customer and rental history from database.");
+  console.log("");
 }
 
 /**
