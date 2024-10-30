@@ -1,11 +1,13 @@
 const { Pool } = require("pg");
+const fs = require("fs");
+const path = require("path");
 
 // PostgreSQL connection
 const pool = new Pool({
   user: "postgres", //This _should_ be your username, as it's the default one Postgres uses
   host: "localhost",
   database: "your_database_name", //This should be changed to reflect your actual database
-  password: "your_database_password", //This should be changed to reflect the password you used when setting up Postgres
+  password: "postgres", //This should be changed to reflect the password you used when setting up Postgres
   port: 5432,
 });
 
@@ -14,45 +16,16 @@ const pool = new Pool({
  */
 async function createTable() {
   try {
-    // Create Movies Table
-    await pool.query(`
-      CREATE TABLE IF NOT EXISTS Movies (
-        movie_id SERIAL PRIMARY KEY,
-        title VARCHAR(255) NOT NULL,
-        release_year INT,
-        genre VARCHAR(100),
-        director_name VARCHAR(255)
-      );
-    `);
-
-    // Create Customers Table
-    await pool.query(`
-      CREATE TABLE IF NOT EXISTS Customers (
-        customer_id SERIAL PRIMARY KEY,
-        first_name VARCHAR(100),
-        last_name VARCHAR(100),
-        email_address VARCHAR(255) UNIQUE NOT NULL,
-        phone_number TEXT
-      );
-    `);
-
-    // Create Rentals Table
-    await pool.query(`
-      CREATE TABLE IF NOT EXISTS Rentals (
-        rental_id SERIAL PRIMARY KEY,
-        customer_id INT REFERENCES Customers(customer_id),
-        movie_id INT REFERENCES Movies(movie_id),
-        rental_date DATE NOT NULL,
-        return_date DATE
-      );
-    `);
-
-    console.log("Tables created.");
+    const createTableQuery = fs.readFileSync(
+      path.join(__dirname, "sql", "create_tables.sql"),
+      "utf-8"
+    );
+    await pool.query(createTableQuery);
+    console.log("Tables created successfully.");
   } catch (err) {
     console.error("Error creating tables:", err);
   }
 }
-
 /**
  * Inserts a new movie into the Movies table.
  *
