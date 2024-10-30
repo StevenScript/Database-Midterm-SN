@@ -4,10 +4,10 @@ const path = require("path");
 
 // PostgreSQL connection
 const pool = new Pool({
-  user: "postgres", //This _should_ be your username, as it's the default one Postgres uses
+  user: "postgres", // Default username for DB(database)
   host: "localhost",
-  database: "your_database_name", //This should be changed to reflect your actual database
-  password: "postgres", //This should be changed to reflect the password you used when setting up Postgres
+  database: "Movie-Store", // My DB name
+  password: "postgres", // DB password
   port: 5432,
 });
 
