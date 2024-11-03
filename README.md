@@ -1,5 +1,9 @@
 # Movie Rental System
 
+## Steven Norris
+
+## 11/03/2024
+
 ## Overview
 
 This CLI application serves as a management tool for a movie rental system. It allows users to interact with a PostgreSQL database containing information about movies, customers, and movie rentals
